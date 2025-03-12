@@ -30,9 +30,12 @@ const Login = () => {
       try {
         setIsLoading(true);
         
-        // Sign in the user using userId directly
+        // Create a valid email format using the userId
+        const email = `${userId}@bitvest.app`;
+        
+        // Sign in the user using the email we created
         const { data, error } = await supabase.auth.signInWithPassword({
-          email: userId, // Using userId directly as the identifier
+          email: email,
           password: password,
         });
         

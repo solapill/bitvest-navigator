@@ -49,9 +49,12 @@ const Register = () => {
       try {
         setIsLoading(true);
         
+        // Create a valid email format using the userId
+        const email = `${userId}@bitvest.app`;
+        
         // Create new user in Supabase Auth
         const { data, error } = await supabase.auth.signUp({
-          email: userId, // Using userId directly as the identifier
+          email: email, // Using a properly formatted email
           password: password,
           options: {
             data: {
