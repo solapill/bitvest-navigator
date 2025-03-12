@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -13,10 +14,10 @@
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
 
-    --primary: 222.2 47.4% 11.2%;
+    --primary: 251 79% 75%;
     --primary-foreground: 210 40% 98%;
 
-    --secondary: 210 40% 96.1%;
+    --secondary: 262 30% 54%;
     --secondary-foreground: 222.2 47.4% 11.2%;
 
     --muted: 210 40% 96.1%;
@@ -30,24 +31,17 @@
 
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
+    --ring: 251 79% 75%;
 
     --radius: 0.5rem;
 
     --sidebar-background: 0 0% 98%;
-
     --sidebar-foreground: 240 5.3% 26.1%;
-
     --sidebar-primary: 240 5.9% 10%;
-
     --sidebar-primary-foreground: 0 0% 98%;
-
     --sidebar-accent: 240 4.8% 95.9%;
-
     --sidebar-accent-foreground: 240 5.9% 10%;
-
     --sidebar-border: 220 13% 91%;
-
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
 
@@ -61,10 +55,10 @@
     --popover: 222.2 84% 4.9%;
     --popover-foreground: 210 40% 98%;
 
-    --primary: 210 40% 98%;
+    --primary: 251 79% 75%;
     --primary-foreground: 222.2 47.4% 11.2%;
 
-    --secondary: 217.2 32.6% 17.5%;
+    --secondary: 262 30% 54%;
     --secondary-foreground: 210 40% 98%;
 
     --muted: 217.2 32.6% 17.5%;
@@ -97,5 +91,31 @@
 
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+@layer components {
+  .bitvest-button {
+    @apply w-[85%] bg-gradient-to-r from-bitvest-purple to-bitvest-secondary text-white font-semibold py-3 rounded-lg shadow-md hover:opacity-90 transition-opacity;
+  }
+  
+  .bottom-fixed {
+    @apply fixed bottom-8 left-1/2 transform -translate-x-1/2;
+  }
+  
+  .validation-rule {
+    @apply flex items-center gap-2 text-xs;
+  }
+  
+  .rule-valid {
+    @apply text-green-500;
+  }
+  
+  .rule-invalid {
+    @apply text-red-500;
+  }
+  
+  .rule-neutral {
+    @apply text-gray-400;
   }
 }
