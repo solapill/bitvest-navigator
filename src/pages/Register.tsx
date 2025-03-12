@@ -3,10 +3,13 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import TopBar from '../components/TopBar';
 import ValidationRule from '../components/ValidationRule';
+import { supabase } from '../integrations/supabase/client';
+import { toast } from 'sonner';
 
 const Register = () => {
   const navigate = useNavigate();
   const [step, setStep] = useState(1);
+  const [isLoading, setIsLoading] = useState(false);
   
   // Step 1 state
   const [userId, setUserId] = useState('');
@@ -39,11 +42,39 @@ const Register = () => {
     passwordsMatch;
   
   // Handle form submission
-  const handleContinue = () => {
+  const handleContinue = async () => {
     if (step === 1 && userIdValid) {
       setStep(2);
     } else if (step === 2 && passwordValid) {
-      navigate('/success');
+      try {
+        setIsLoading(true);
+        
+        // Create new user in Supabase Auth
+        const { data, error } = await supabase.auth.signUp({
+          email: `${userId}@bitvest.example.com`, // Using a dummy email
+          password: password,
+          options: {
+            data: {
+              user_id: userId,
+            },
+          },
+        });
+        
+        if (error) {
+          console.error('Registration error:', error);
+          toast.error(error.message || 'Registration failed. Please try again.');
+          setIsLoading(false);
+          return;
+        }
+        
+        toast.success('Registration successful!');
+        navigate('/success');
+      } catch (err) {
+        console.error('Registration error:', err);
+        toast.error('An unexpected error occurred. Please try again.');
+      } finally {
+        setIsLoading(false);
+      }
     }
   };
   
@@ -152,10 +183,10 @@ const Register = () => {
             
             <button
               className="bitvest-button mx-auto"
-              disabled={!passwordValid}
+              disabled={!passwordValid || isLoading}
               onClick={handleContinue}
             >
-              Register
+              {isLoading ? 'Registering...' : 'Register'}
             </button>
           </div>
         )}

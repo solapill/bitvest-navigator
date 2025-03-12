@@ -1,12 +1,15 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import TopBar from '../components/TopBar';
 import ValidationRule from '../components/ValidationRule';
+import { supabase } from '../integrations/supabase/client';
+import { toast } from 'sonner';
 
 const Login = () => {
   const navigate = useNavigate();
   const [step, setStep] = useState(1);
+  const [isLoading, setIsLoading] = useState(false);
   
   // Step 1 state
   const [userId, setUserId] = useState('');
@@ -39,11 +42,34 @@ const Login = () => {
     passwordsMatch;
   
   // Handle form submission
-  const handleContinue = () => {
+  const handleContinue = async () => {
     if (step === 1 && userIdValid) {
       setStep(2);
     } else if (step === 2 && passwordValid) {
-      navigate('/home');
+      try {
+        setIsLoading(true);
+        
+        // Sign in the user
+        const { data, error } = await supabase.auth.signInWithPassword({
+          email: `${userId}@bitvest.example.com`, // Using a dummy email based on userId
+          password: password,
+        });
+        
+        if (error) {
+          console.error('Login error:', error);
+          toast.error(error.message || 'Login failed. Please check your credentials.');
+          setIsLoading(false);
+          return;
+        }
+        
+        toast.success('Login successful!');
+        navigate('/home');
+      } catch (err) {
+        console.error('Login error:', err);
+        toast.error('An unexpected error occurred. Please try again.');
+      } finally {
+        setIsLoading(false);
+      }
     }
   };
   
@@ -152,10 +178,10 @@ const Login = () => {
             
             <button
               className="bitvest-button mx-auto"
-              disabled={!passwordValid}
+              disabled={!passwordValid || isLoading}
               onClick={handleContinue}
             >
-              Login
+              {isLoading ? 'Logging in...' : 'Login'}
             </button>
           </div>
         )}
