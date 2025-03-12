@@ -14,6 +14,8 @@ const Register = () => {
   // Step 1 state
   const [userId, setUserId] = useState('');
   const [userIdTouched, setUserIdTouched] = useState(false);
+  const [email, setEmail] = useState('');
+  const [emailTouched, setEmailTouched] = useState(false);
   
   // Step 2 state
   const [password, setPassword] = useState('');
@@ -25,6 +27,8 @@ const Register = () => {
   const userIdLength = userId.length >= 6 && userId.length <= 15;
   const userIdHasNumber = /[0-9]/.test(userId);
   const userIdValid = userIdLength && userIdHasNumber;
+  
+  const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
   
   const passwordLength = password.length >= 8 && password.length <= 20;
   const passwordHasSpecial = /[!*%&#@*$]/.test(password);
@@ -41,20 +45,19 @@ const Register = () => {
     passwordHasNumber && 
     passwordsMatch;
   
+  const step1Valid = userIdValid && emailValid;
+  
   // Handle form submission
   const handleContinue = async () => {
-    if (step === 1 && userIdValid) {
+    if (step === 1 && step1Valid) {
       setStep(2);
     } else if (step === 2 && passwordValid) {
       try {
         setIsLoading(true);
         
-        // Create a valid email format using the userId
-        const email = `${userId}@bitvest.app`;
-        
         // Create new user in Supabase Auth
         const { data, error } = await supabase.auth.signUp({
-          email: email, // Using a properly formatted email
+          email: email,
           password: password,
           options: {
             data: {
@@ -87,12 +90,14 @@ const Register = () => {
       
       <div className="p-6 flex flex-col items-center">
         {step === 1 ? (
-          /* Step 1: User ID */
+          /* Step 1: User ID and Email */
           <div className="w-full max-w-md">
-            <h2 className="text-2xl font-bold mb-6 text-center">UserID</h2>
+            <h2 className="text-2xl font-bold mb-6 text-center">Create Account</h2>
             
             <div className="mb-6">
+              <label htmlFor="userId" className="block text-gray-700 mb-2">User ID</label>
               <input
+                id="userId"
                 type="text"
                 value={userId}
                 onChange={(e) => setUserId(e.target.value)}
@@ -100,24 +105,49 @@ const Register = () => {
                 className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-bitvest-purple"
                 placeholder="Enter your user ID"
               />
+              
+              {userIdTouched && (
+                <div className="mt-2 space-y-1">
+                  <ValidationRule 
+                    text="6-15 Characters" 
+                    isValid={userIdLength} 
+                    isTouched={userIdTouched} 
+                  />
+                  <ValidationRule 
+                    text="One Number (0-9)" 
+                    isValid={userIdHasNumber} 
+                    isTouched={userIdTouched} 
+                  />
+                </div>
+              )}
             </div>
             
-            <div className="mb-8 space-y-2">
-              <ValidationRule 
-                text="6-15 Characters" 
-                isValid={userIdLength} 
-                isTouched={userIdTouched} 
+            <div className="mb-6">
+              <label htmlFor="email" className="block text-gray-700 mb-2">Email</label>
+              <input
+                id="email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                onBlur={() => setEmailTouched(true)}
+                className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-bitvest-purple"
+                placeholder="Enter your email address"
               />
-              <ValidationRule 
-                text="One Number (0-9)" 
-                isValid={userIdHasNumber} 
-                isTouched={userIdTouched} 
-              />
+              
+              {emailTouched && (
+                <div className="mt-2 space-y-1">
+                  <ValidationRule 
+                    text="Valid Email Format" 
+                    isValid={emailValid} 
+                    isTouched={emailTouched} 
+                  />
+                </div>
+              )}
             </div>
             
             <button
               className="bitvest-button mx-auto"
-              disabled={!userIdValid}
+              disabled={!step1Valid}
               onClick={handleContinue}
             >
               Continue
